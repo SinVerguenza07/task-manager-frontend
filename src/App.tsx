@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { AppFooter } from './components/AppFooter';
 import { AppHeader } from './components/AppHeader';
+import { TaskActions } from './components/TaskActions';
 import { TaskFilters } from './components/TaskFilters';
 import { TaskForm } from './components/TaskForm';
 import { TaskList } from './components/TaskList';
@@ -11,6 +13,10 @@ export default function App() {
   const [tasks, setTasks] = useState<Task[]>(
     () => [...initialTasks],
   );
+
+  const completedCount = tasks.filter(
+    (task) => task.status === 'completed',
+  ).length;
 
   function handleAddTask(title: string) {
     const now = new Date().toISOString();
@@ -91,14 +97,42 @@ export default function App() {
     );
   }
 
+  function handleClearCompleted() {
+    if (completedCount === 0) {
+      return;
+    }
+
+    const shouldClear = window.confirm(
+      `¿Eliminar ${completedCount} ${
+        completedCount === 1
+          ? 'tarea completada'
+          : 'tareas completadas'
+      }?`,
+    );
+
+    if (!shouldClear) {
+      return;
+    }
+
+    setTasks((currentTasks) =>
+      currentTasks.filter(
+        (task) => task.status !== 'completed',
+      ),
+    );
+  }
+
   return (
-    <div className="app-shell">
+    <div className="flex min-h-screen min-w-[320px] flex-col bg-slate-100 font-sans text-slate-800 antialiased">
       <AppHeader />
 
-      <main className="app-main">
+      <main className="mx-auto grid w-full max-w-6xl flex-1 gap-5 px-4 pb-12 pt-6 sm:px-6">
         <TaskForm onAddTask={handleAddTask} />
         <TaskFilters />
         <TaskSummary tasks={tasks} />
+        <TaskActions
+          completedCount={completedCount}
+          onClearCompleted={handleClearCompleted}
+        />
         <TaskList
           tasks={tasks}
           onToggleStatus={handleToggleStatus}
@@ -107,11 +141,7 @@ export default function App() {
         />
       </main>
 
-      <footer className="app-footer">
-        <div className="app-footer__content">
-          <p>Administrador de tareas - Frontend EC2</p>
-        </div>
-      </footer>
+      <AppFooter courseName="Frontend EC2" />
     </div>
   );
 }

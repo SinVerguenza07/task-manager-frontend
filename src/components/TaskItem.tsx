@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import type { Task } from '../models/task.interface';
+import { TaskStatusBadge } from './TaskStatusBadge';
 
 interface TaskItemProps {
   task: Task;
@@ -15,6 +16,15 @@ function formatTaskDate(value: string): string {
   }).format(new Date(value));
 }
 
+const baseButton =
+  'rounded-md border px-3 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
+
+const secondaryButton = `${baseButton} border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:outline-teal-600`;
+
+const primaryButton = `${baseButton} border-teal-700 bg-teal-700 text-white hover:bg-teal-800 focus-visible:outline-teal-600`;
+
+const dangerButton = `${baseButton} border-red-300 bg-white text-red-700 hover:bg-red-50 focus-visible:outline-red-600`;
+
 export function TaskItem({
   task,
   onToggleStatus,
@@ -25,11 +35,7 @@ export function TaskItem({
   const [isEditing, setIsEditing] = useState(false);
   const [draftTitle, setDraftTitle] = useState(title);
   const normalizedDraft = draftTitle.trim();
-
-  const statusLabel =
-    status === 'completed'
-      ? 'Completada'
-      : 'Pendiente';
+  const isCompleted = status === 'completed';
 
   function handleStartEdit() {
     setDraftTitle(title);
@@ -56,13 +62,17 @@ export function TaskItem({
 
   return (
     <article
-      className={`task-item task-item--${status}`}
+      className={`flex flex-col gap-4 border-l-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between ${
+        isCompleted
+          ? 'border-l-teal-600 bg-teal-50/40'
+          : 'border-l-amber-500 bg-white'
+      }`}
       role="listitem"
     >
-      <div className="task-item__content">
+      <div className="min-w-0 flex-1">
         {isEditing ? (
           <form
-            className="task-item__edit-form"
+            className="grid w-full gap-2.5"
             onSubmit={handleEditSubmit}
           >
             <label
@@ -74,7 +84,7 @@ export function TaskItem({
 
             <input
               id={`edit-task-${id}`}
-              className="task-item__edit-input"
+              className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-teal-600 focus:outline-2 focus:outline-offset-0 focus:outline-teal-200"
               value={draftTitle}
               onChange={(event) =>
                 setDraftTitle(event.target.value)
@@ -84,15 +94,17 @@ export function TaskItem({
               required
             />
 
-            <div className="task-item__edit-actions">
+            <div className="flex flex-wrap gap-2">
               <button
                 type="submit"
+                className={primaryButton}
                 disabled={!normalizedDraft}
               >
                 Guardar
               </button>
               <button
                 type="button"
+                className={secondaryButton}
                 onClick={handleCancelEdit}
               >
                 Cancelar
@@ -100,34 +112,39 @@ export function TaskItem({
             </div>
           </form>
         ) : (
-          <>
-            <h3 className="task-item__title">
+          <div className="grid justify-items-start gap-1.5">
+            <h3
+              className={`wrap-break-word text-base font-semibold ${
+                isCompleted
+                  ? 'text-slate-500 line-through'
+                  : 'text-slate-900'
+              }`}
+            >
               {title}
             </h3>
 
-            <span
-              className={`status-badge status-badge--${status}`}
-            >
-              {statusLabel}
-            </span>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                 <TaskStatusBadge status={status} />
 
-            <p className="task-item__date">
-              Actualizada:{' '}
-              <time dateTime={updatedAt}>
-                {formatTaskDate(updatedAt)}
-              </time>
-            </p>
-          </>
+              <p className="text-xs text-slate-500">
+                Actualizada:{' '}
+                <time dateTime={updatedAt}>
+                  {formatTaskDate(updatedAt)}
+                </time>
+              </p>
+            </div>
+          </div>
         )}
       </div>
 
       <div
-        className="task-item__actions"
+        className="flex flex-wrap gap-2 sm:justify-end"
         role="group"
         aria-label={`Acciones para ${title}`}
       >
         <button
           type="button"
+          className={secondaryButton}
           onClick={() => onToggleStatus(id)}
           disabled={isEditing}
         >
@@ -138,6 +155,7 @@ export function TaskItem({
 
         <button
           type="button"
+          className={secondaryButton}
           onClick={handleStartEdit}
           disabled={isEditing}
         >
@@ -146,7 +164,7 @@ export function TaskItem({
 
         <button
           type="button"
-          className="button-danger"
+          className={dangerButton}
           onClick={() => onDeleteTask(id)}
           disabled={isEditing}
         >
