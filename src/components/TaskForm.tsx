@@ -70,7 +70,7 @@ export function TaskForm({
           <button
             type="submit"
             disabled={!normalizedTitle}
-            className="w-full rounded-md border border-teal-700 bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-teal-700 sm:w-auto"
+            className="w-full rounded-md cursor-pointer border border-teal-700 bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-teal-700 sm:w-auto"
           >
             Agregar tarea
           </button>

@@ -17,7 +17,7 @@ function formatTaskDate(value: string): string {
 }
 
 const baseButton =
-  'rounded-md border px-3 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
+  'rounded-md cursor-pointer border px-3 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
 
 const secondaryButton = `${baseButton} border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:outline-teal-600`;
 

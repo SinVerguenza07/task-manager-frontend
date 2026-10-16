@@ -24,7 +24,7 @@ export function TaskActions({
         type="button"
         onClick={onClearCompleted}
         disabled={completedCount === 0}
-        className="w-full rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white sm:w-auto"
+        className="w-full rounded-md cursor-pointer border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white sm:w-auto"
       >
         Eliminar completadas
       </button>
