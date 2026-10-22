@@ -1,76 +1,79 @@
-const fieldClass =
-  'w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-teal-600 focus:outline-2 focus:outline-offset-0 focus:outline-teal-200';
-
-const labelClass =
-  'text-sm font-semibold text-slate-700';
-
-export function TaskFilters() {
+import type { TaskFilter, TaskSort } from "../models/task-view.types";
+interface TaskFiltersProps {
+  query: string;
+  filter: TaskFilter;
+  sortBy: TaskSort;
+  resultCount: number;
+  onQueryChange: (value: string) => void;
+  onFilterChange: (value: TaskFilter) => void;
+  onSortChange: (value: TaskSort) => void;
+  onClear: () => void;
+}
+export function TaskFilters({
+  query,
+  filter,
+  sortBy,
+  resultCount,
+  onQueryChange,
+  onFilterChange,
+  onSortChange,
+  onClear,
+}: TaskFiltersProps) {
+  const hasActiveCriteria =
+    query.trim() !== "" || filter !== "all" || sortBy !== "updated-desc";
+  const resultLabel =
+    resultCount === 1
+      ? "1 resultado visible."
+      : `${resultCount} resultados visibles.`;
   return (
-    <section
-      className="overflow-hidden rounded-md border border-slate-300 bg-white shadow-sm"
-      aria-labelledby="filters-title"
-    >
-      <div className="border-b border-slate-300 bg-slate-50 px-5 py-4">
-        <p className="mb-0.5 text-xs font-bold uppercase tracking-wider text-teal-700">
-          Consulta
-        </p>
-        <h2
-          id="filters-title"
-          className="text-lg font-semibold text-slate-900"
-        >
-          Buscar y organizar
-        </h2>
-      </div>
-
-      <div className="grid gap-4 p-5">
-        <div className="grid gap-4 sm:grid-cols-[2fr_1fr_1fr]">
-          <div className="grid content-start gap-1.5">
-            <label className={labelClass} htmlFor="task-search">
-              Buscar por título
-            </label>
-            <input
-              id="task-search"
-              type="search"
-              placeholder="Escribe una palabra"
-              className={fieldClass}
-            />
-          </div>
-
-          <div className="grid content-start gap-1.5">
-            <label className={labelClass} htmlFor="status-filter">
-              Estado
-            </label>
-            <select
-              id="status-filter"
-              defaultValue="all"
-              className={fieldClass}
-            >
-              <option value="all">Todas</option>
-              <option value="pending">Pendientes</option>
-              <option value="completed">Completadas</option>
-            </select>
-          </div>
-
-          <div className="grid content-start gap-1.5">
-            <label className={labelClass} htmlFor="task-order">
-              Orden
-            </label>
-            <select
-              id="task-order"
-              defaultValue="newest"
-              className={fieldClass}
-            >
-              <option value="newest">Más recientes</option>
-              <option value="oldest">Más antiguas</option>
-              <option value="title">Por título</option>
-            </select>
-          </div>
+    <section className="panel" aria-labelledby="task-filters-title">
+      <div className="section-heading">
+        <div>
+          <p className="section-heading__eyebrow">Consulta</p>
+          <h2 id="task-filters-title">Buscar y organizar</h2>
         </div>
-
-        <p className="text-sm text-slate-500">
-          Los controles son demostrativos y todavía no modifican los resultados.
-        </p>
       </div>
+      <div className="filters-grid">
+        <label className="filter-field">
+          <span>Buscar por título</span>
+          <input
+            type="search"
+            value={query}
+            placeholder="Ejemplo: documentación"
+            onChange={(event) => onQueryChange(event.target.value)}
+          />
+        </label>
+        <label className="filter-field">
+          <span>Estado</span>
+          <select
+            value={filter}
+            onChange={(event) =>
+              onFilterChange(event.target.value as TaskFilter)
+            }
+          >
+            <option value="all">Todas</option>
+            <option value="pending">Pendientes</option>
+            <option value="completed">Completadas</option>
+          </select>
+        </label>
+        <label className="filter-field">
+          <span>Ordenar por</span>
+          <select
+            value={sortBy}
+            onChange={(event) => onSortChange(event.target.value as TaskSort)}
+          >
+            <option value="updated-desc">Actualización reciente</option>
+            <option value="created-desc">Creación reciente</option>
+            <option value="title-asc">Título A a Z</option>
+          </select>
+        </label>
+        <button type="button" onClick={onClear} disabled={!hasActiveCriteria}>
+          Limpiar criterios
+        </button>
+      </div>
+      <p className="filter-results" role="status">
+        {resultLabel}
+      </p>
     </section>
   );
 }
