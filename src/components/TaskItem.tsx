@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import type { Task } from "../models/task.interface";
+import { TaskStatusBadge } from "./TaskStatusBadge";
 import {
   TASK_TITLE_MAX_LENGTH,
   validateTaskTitle,
@@ -26,7 +27,6 @@ export function TaskItem({
   const [isEditing, setIsEditing] = useState(false);
   const [draftTitle, setDraftTitle] = useState(title);
   const [error, setError] = useState("");
-  const statusLabel = status === "completed" ? "Completada" : "Pendiente";
   function handleStartEdit(): void {
     setDraftTitle(title);
     setError("");
@@ -54,12 +54,20 @@ export function TaskItem({
     setError("");
     setIsEditing(false);
   }
+  const actionButtonClass =
+    "rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white";
+
   return (
-    <article className={`task-item task-item--${status}`} role="listitem">
-      <div className="task-item__content">
+    <article
+      className={`flex flex-col gap-3 rounded-md border border-l-4 border-slate-300 bg-white p-4 sm:flex-row sm:items-center sm:justify-between ${
+        status === "completed" ? "border-l-teal-600" : "border-l-amber-500"
+      }`}
+      role="listitem"
+    >
+      <div className="min-w-0 flex-1">
         {isEditing ? (
           <form
-            className="task-item__edit-form"
+            className="grid gap-2"
             onSubmit={handleEditSubmit}
             noValidate
           >
@@ -68,7 +76,7 @@ export function TaskItem({
             </label>
             <input
               id={`edit-task-${id}`}
-              className="task-item__edit-input"
+              className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-teal-600 aria-invalid:border-red-500"
               value={draftTitle}
               maxLength={TASK_TITLE_MAX_LENGTH}
               onChange={(event) => handleDraftChange(event.target.value)}
@@ -77,48 +85,75 @@ export function TaskItem({
               autoFocus
             />
             {error && (
-              <p id={`edit-error-${id}`} className="field-error" role="alert">
+              <p
+                id={`edit-error-${id}`}
+                className="text-sm font-medium text-red-700"
+                role="alert"
+              >
                 {error}
               </p>
             )}
-            <div className="task-item__edit-actions">
-              <button type="submit">Guardar</button>
-              <button type="button" onClick={handleCancelEdit}>
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                className="rounded-md bg-teal-700 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-teal-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+              >
+                Guardar
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelEdit}
+                className={actionButtonClass}
+              >
                 Cancelar
               </button>
             </div>
           </form>
         ) : (
           <>
-            <h3 className="task-item__title">{title}</h3>
-            <span className={`status-badge status-badge--${status}`}>
-              {statusLabel}
-            </span>
-            <p className="task-item__date">
-              Actualizada:{" "}
-              <time dateTime={updatedAt}>{formatTaskDate(updatedAt)}</time>
-            </p>
+            <h3
+              className={`mb-1.5 break-words text-base font-semibold ${
+                status === "completed"
+                  ? "text-slate-500 line-through"
+                  : "text-slate-900"
+              }`}
+            >
+              {title}
+            </h3>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <TaskStatusBadge status={status} />
+              <p className="text-xs text-slate-500">
+                Actualizada:{" "}
+                <time dateTime={updatedAt}>{formatTaskDate(updatedAt)}</time>
+              </p>
+            </div>
           </>
         )}
       </div>
       <div
-        className="task-item__actions"
+        className="flex flex-wrap gap-2"
         role="group"
         aria-label={`Acciones para ${title}`}
       >
         <button
           type="button"
+          className={actionButtonClass}
           onClick={() => onToggleStatus(id)}
           disabled={isEditing}
         >
           {status === "completed" ? "Reabrir" : "Completar"}
         </button>
-        <button type="button" onClick={handleStartEdit} disabled={isEditing}>
+        <button
+          type="button"
+          className={actionButtonClass}
+          onClick={handleStartEdit}
+          disabled={isEditing}
+        >
           Editar
         </button>
         <button
           type="button"
-          className="button-danger"
+          className="rounded-md border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-700 transition hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
           onClick={() => onDeleteTask(id)}
           disabled={isEditing}
         >
