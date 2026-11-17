@@ -1,52 +1,37 @@
 # Administrador de tareas Frontend
 
-SPA desarrollada con React, TypeScript, Vite,
-React Router y Fetch API.
+SPA con React TypeScript Vite y React Router.
+Consume una API REST protegida mediante JWT Bearer.
 
-## Funciones actuales
+## Funciones
 
-- Registro e inicio de sesión.
-- Restauración de identidad con /api/auth/me.
+- Registro login restauración y logout.
 - Rutas públicas y protegidas.
-- CRUD remoto de tareas.
-- Búsqueda, filtros, ordenamiento y paginación.
-- Eliminación disponible para admin.
-- Manejo de carga, vacío, error, 401 y 403.
+- CRUD remoto.
+- Búsqueda filtros orden y paginación.
+- Detalle por identificador.
+- Permisos user y admin.
+- Pruebas y despliegue estático.
 
-## Rutas
+## Instalación
 
-- `/`
-- `/login`
-- `/register`
-- `/tasks` protegida
-- `/tasks/:taskId` protegida
+pnpm install --frozen-lockfile
 
-## Variables
+## Desarrollo
 
-```env
-VITE_API_URL=/api
-```
+1. Copiar .env.example como .env.local.
+2. Confirmar VITE_API_URL=/api.
+3. Iniciar Backend en localhost:3000.
+4. Ejecutar pnpm dev.
 
-## Ejecución
+## Verificación
 
-```bash
-pnpm install
-pnpm dev
-```
+pnpm verify
 
-La API debe ejecutarse en el puerto configurado por
-el proxy de Vite.
+## Producción
 
-## Seguridad didáctica
-
-El access token se conserva en sessionStorage para
-practicar restauración dentro de la pestaña. No se
-almacenan contraseñas ni se imprimen tokens. La API
-mantiene la autenticación y autorización reales.
-
-## Validación
-
-```bash
-pnpm lint
-pnpm build
-```
+- Frontend: URL_FRONTEND
+- API: URL_BACKEND
+- Versión: 1.0.0
+  Consulta docs/deployment-configuration.md y
+  docs/release-checklist.md.
