@@ -1,49 +1,22 @@
-import type { Task } from '../models/task.interface';
-
+import type { Task } from "../models/task.interface";
 interface TaskSummaryProps {
   tasks: Task[];
+  total: number;
 }
-
-export function TaskSummary({
-  tasks,
-}: TaskSummaryProps) {
-  const completed = tasks.filter(
-    ({ status }) => status === 'completed',
+export function TaskSummary({ tasks, total }: TaskSummaryProps) {
+  const pendingOnPage = tasks.filter(
+    (task) => task.status === "pending",
   ).length;
-
-  const pending =
-    tasks.length - completed;
-
-  const cardClass =
-    'grid gap-1 rounded-md border border-t-4 border-slate-300 bg-white p-4 shadow-sm sm:p-5';
-  const labelClass =
-    'text-xs font-semibold uppercase tracking-wider text-slate-500';
-  const valueClass =
-    'text-3xl font-bold tabular-nums text-slate-900';
-
+  const completedOnPage = tasks.length - pendingOnPage;
   return (
-    <section
-      className="grid grid-cols-1 gap-4 sm:grid-cols-3"
-      aria-label="Resumen de tareas"
-    >
-      <article className={`${cardClass} border-t-slate-700`}>
-        <span className={labelClass}>Total</span>
-        <strong className={valueClass}>
-          {tasks.length}
-        </strong>
-      </article>
-
-      <article className={`${cardClass} border-t-amber-500`}>
-        <span className={labelClass}>Pendientes</span>
-        <strong className={valueClass}>{pending}</strong>
-      </article>
-
-      <article className={`${cardClass} border-t-teal-600`}>
-        <span className={labelClass}>Completadas</span>
-        <strong className={valueClass}>
-          {completed}
-        </strong>
-      </article>
+    <section className="task-summary" aria-label="Resumen de tareas">
+      <p>
+        <strong>{total}</strong> resultado(s) en la consulta
+      </p>
+      <p>
+        Página actual: {pendingOnPage} pendiente(s) y {completedOnPage}{" "}
+        completada(s)
+      </p>
     </section>
   );
 }
