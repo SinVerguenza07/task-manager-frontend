@@ -49,37 +49,52 @@ export function AuthProvider({ children }: AuthProviderProps) {
     });
   }, [endSession]);
   const validateSession = useCallback(
-    async (token: string, signal?: AbortSignal): Promise<void> => {
-      setStatus("checking");
-      setSessionMessage("");
-
-      try {
-        const response = await getAuthenticatedUser(token, signal);
-        setUser(response.data.user);
-        setAccessToken(token);
-        setStatus("authenticated");
-      } catch (error) {
-        if (isAbortError(error)) {
-          return;
-        }
-        if (isHttpError(error) && error.status === 401) {
-          return;
-        }
-        setUser(null);
-        setStatus("error");
-        setSessionMessage(getHttpErrorMessage(error));
+  async (token: string, signal?: AbortSignal): Promise<void> => {
+    try {
+      const response = await getAuthenticatedUser(token, signal);
+      setUser(response.data.user);
+      setAccessToken(token);
+      setStatus("authenticated");
+    } catch (error) {
+      if (isAbortError(error)) {
+        return;
       }
-    },
-    [],
-  );
-  useEffect(() => {
-    if (!initialToken) {
-      return;
+      if (isHttpError(error) && error.status === 401) {
+        return;
+      }
+      setUser(null);
+      setStatus("error");
+      setSessionMessage(getHttpErrorMessage(error));
     }
-    const controller = new AbortController();
-    void validateSession(initialToken, controller.signal);
-    return () => controller.abort();
-  }, [initialToken, validateSession]);
+  },
+  [],
+);
+  useEffect(() => {
+  if (!initialToken) {
+    return;
+  }
+  const controller = new AbortController();
+
+  getAuthenticatedUser(initialToken, controller.signal)
+    .then((response) => {
+      setUser(response.data.user);
+      setAccessToken(initialToken);
+      setStatus("authenticated");
+    })
+    .catch((error: unknown) => {
+      if (isAbortError(error)) {
+        return;
+      }
+      if (isHttpError(error) && error.status === 401) {
+        return; // el manejador global ya cerró la sesión
+      }
+      setUser(null);
+      setStatus("error");
+      setSessionMessage(getHttpErrorMessage(error));
+    });
+
+  return () => controller.abort();
+}, [initialToken]);
   const login = useCallback(
     async (credentials: LoginCredentials): Promise<AuthUser> => {
       const response = await loginUser(credentials);
@@ -104,12 +119,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
     endSession("Cerraste sesión correctamente.");
   }, [endSession]);
   const retrySession = useCallback(async (): Promise<void> => {
-    if (!accessToken) {
-      endSession("Inicia sesión para continuar.");
-      return;
-    }
-    await validateSession(accessToken);
-  }, [accessToken, endSession, validateSession]);
+  if (!accessToken) {
+    endSession("Inicia sesión para continuar.");
+    return;
+  }
+  setStatus("checking");
+  setSessionMessage("");
+  await validateSession(accessToken);
+}, [accessToken, endSession, validateSession]);
   const clearSessionMessage = useCallback(
     (): void => setSessionMessage(""),
     [],
