@@ -1,15 +1,12 @@
 import type { Task } from "../models/task.interface";
-import { SectionHeading } from "./SectionHeading";
 import { TaskItem } from "./TaskItem";
-
 interface TaskListProps {
   tasks: Task[];
   emptyMessage: string;
   onToggleStatus: (id: string) => void;
   onEditTask: (id: string, title: string) => void;
-  onDeleteTask: (id: string) => void;
+  onDeleteTask: (id: string) => boolean;
 }
-
 export function TaskList({
   tasks,
   emptyMessage,
@@ -18,34 +15,22 @@ export function TaskList({
   onDeleteTask,
 }: TaskListProps) {
   const resultLabel = tasks.length === 1 ? "1 tarea" : `${tasks.length} tareas`;
-
   return (
-    <section
-      className="rounded-md border border-slate-300 bg-white p-5 shadow-sm sm:p-6"
-      aria-labelledby="task-list-title"
-    >
-      <SectionHeading
-        eyebrow="Actividades"
-        title="Tareas registradas"
-        titleId="task-list-title"
-        aside={
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-            {resultLabel}
-          </span>
-        }
-      />
+    <section className="panel" aria-labelledby="task-list-title">
+      <div className="section-heading">
+        <div>
+          <p className="section-heading__eyebrow">Actividades</p>
+          <h2 id="task-list-title">Tareas registradas</h2>
+        </div>
+        <span className="result-count">{resultLabel}</span>
+      </div>
       {tasks.length === 0 ? (
-        <div
-          className="rounded-md border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center"
-          role="status"
-        >
-          <h3 className="mb-1 text-base font-semibold text-slate-800">
-            Sin resultados
-          </h3>
-          <p className="text-sm text-slate-600">{emptyMessage}</p>
+        <div className="empty-state" role="status">
+          <h3>Sin resultados</h3>
+          <p>{emptyMessage}</p>
         </div>
       ) : (
-        <div className="grid gap-3" role="list">
+        <div className="task-list" role="list">
           {tasks.map((task) => (
             <TaskItem
               key={task.id}

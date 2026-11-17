@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { AppFooter } from "./components/AppFooter";
-import { AppHeader } from "./components/AppHeader";
-import { TaskFilters } from "./components/TaskFilters";
-import { TaskForm } from "./components/TaskForm";
-import { TaskList } from "./components/TaskList";
-import { TaskSummary } from "./components/TaskSummary";
+import { Route, Routes } from "react-router";
 import { tasks as initialTasks } from "./data/tasks";
+import { AppLayout } from "./layouts/AppLayout";
 import type { Task } from "./models/task.interface";
 import type { TaskFilter, TaskSort } from "./models/task-view.types";
+import { HomePage } from "./pages/HomePage";
+import { NotFoundPage } from "./pages/NotFoundPage";
+import { TaskDetailPage } from "./pages/TaskDetailPage";
+import { TasksPage } from "./pages/TasksPage";
 import { getVisibleTasks } from "./services/task-query.service";
 import { loadTasks, saveTasks } from "./services/task-storage.service";
 export default function App() {
@@ -67,18 +67,19 @@ export default function App() {
       ),
     );
   }
-  function handleDeleteTask(id: string): void {
+  function handleDeleteTask(id: string): boolean {
     const selectedTask = tasks.find((task) => task.id === id);
     if (!selectedTask) {
-      return;
+      return false;
     }
     const shouldDelete = window.confirm(
       `¿Eliminar la tarea "${selectedTask.title}"?`,
     );
     if (!shouldDelete) {
-      return;
+      return false;
     }
     setTasks((currentTasks) => currentTasks.filter((task) => task.id !== id));
+    return true;
   }
   function handleClearCriteria(): void {
     setQuery("");
@@ -86,30 +87,38 @@ export default function App() {
     setSortBy("updated-desc");
   }
   return (
-    <div className="flex min-h-screen flex-col">
-      <AppHeader />
-      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6">
-        <TaskForm onAddTask={handleAddTask} />
-        <TaskFilters
-          query={query}
-          filter={filter}
-          sortBy={sortBy}
-          resultCount={visibleTasks.length}
-          onQueryChange={setQuery}
-          onFilterChange={setFilter}
-          onSortChange={setSortBy}
-          onClear={handleClearCriteria}
+    <Routes>
+      <Route element={<AppLayout />}>
+        <Route index element={<HomePage tasks={tasks} />} />
+        <Route
+          path="tasks"
+          element={
+            <TasksPage
+              tasks={tasks}
+              visibleTasks={visibleTasks}
+              query={query}
+              filter={filter}
+              sortBy={sortBy}
+              emptyMessage={emptyMessage}
+              onAddTask={handleAddTask}
+              onQueryChange={setQuery}
+              onFilterChange={setFilter}
+              onSortChange={setSortBy}
+              onClearCriteria={handleClearCriteria}
+              onToggleStatus={handleToggleStatus}
+              onEditTask={handleEditTask}
+              onDeleteTask={handleDeleteTask}
+            />
+          }
         />
-        <TaskSummary tasks={tasks} />
-        <TaskList
-          tasks={visibleTasks}
-          emptyMessage={emptyMessage}
-          onToggleStatus={handleToggleStatus}
-          onEditTask={handleEditTask}
-          onDeleteTask={handleDeleteTask}
+        <Route
+          path="tasks/:taskId"
+          element={
+            <TaskDetailPage tasks={tasks} onDeleteTask={handleDeleteTask} />
+          }
         />
-      </main>
-      <AppFooter courseName="Frontend EC2" />
-    </div>
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>
+    </Routes>
   );
 }
