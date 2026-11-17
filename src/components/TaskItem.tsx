@@ -9,12 +9,14 @@ import {
 } from "../utils/task-validation";
 interface TaskItemProps {
   task: Task;
+  canDelete: boolean;
   onToggleStatus: (task: Task) => Promise<boolean>;
   onEditTask: (task: Task, title: string) => Promise<boolean>;
   onDeleteTask: (task: Task) => Promise<boolean>;
 }
 export function TaskItem({
   task,
+  canDelete,
   onToggleStatus,
   onEditTask,
   onDeleteTask,
@@ -139,14 +141,16 @@ export function TaskItem({
         >
           Editar
         </button>
-        <button
-          type="button"
-          className="button-danger"
-          disabled={isBusy || isEditing}
-          onClick={() => void handleDelete()}
-        >
-          Eliminar
-        </button>
+        {canDelete && (
+          <button
+            type="button"
+            className="button-danger"
+            disabled={isBusy || isEditing}
+            onClick={() => void handleDelete()}
+          >
+            Eliminar
+          </button>
+        )}
       </div>
     </article>
   );
